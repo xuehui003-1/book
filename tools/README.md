@@ -37,3 +37,25 @@ python3 tools/check_docx.py *.docx --md 自检报告.md
 ## 注意
 - C11 只是**提示**，AI 行文特征需人工判断，脚本无法替代润色。
 - 引号批量修复依赖"每段引号数量为偶数"这一前提；若某段引号为奇数，脚本会报出"引号不配对"，需人工处理该段。
+
+---
+
+## 附：配套文件
+
+| 文件 | 说明 |
+|---|---|
+| `check_docx.py` | 自检脚本（10 类问题） |
+| `docx_utils.py` | docx 段落级读写工具库（段落定位、整段重建、居中设置等） |
+| `revise_project1_v2.py` | 项目1 V2 修订脚本，可作为项目2～12 修订脚本的模板 |
+
+### 修订脚本的通用套路
+```python
+import sys; sys.path.insert(0, 'tools')
+from docx_utils import *
+raw = open('work/word/document.xml', encoding='utf-8').read()
+i, a, b = find_para(raw, '要定位的段落文字')          # 定位
+raw = repl_in_t(raw, '旧文字', '新文字')               # 单 run 内替换
+raw = raw[:a] + rebuild_para(raw[a:b], '新整段文字') + raw[b:]   # 跨 run 时整段重建
+raw = delete_paras(raw, [i])                          # 删除整段
+```
+> 注意：Word 常把「题号」和「正文」拆成多个 `<w:r>` / `<w:t>`，因此**跨 run 的文字必须整段重建**，否则会匹配失败。
