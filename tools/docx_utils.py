@@ -9,6 +9,7 @@ docx 段落级读写工具 —— 供 check_docx.py 与各册修订脚本复用
   · 文字替换优先在单个 <w:t> 内进行；跨 run 的用整段重建
 """
 import re, html
+import html as _html
 
 NS_P = re.compile(r'<w:p[ >]')
 NS_T = re.compile(r'<w:t(?: [^>]*)?>(.*?)</w:t>', re.S)
@@ -239,3 +240,48 @@ def normalize_punct_docx(raw, verbose=False):
     if verbose:
         print('  normalize_punct：改动 %d 个文本节点' % n)
     return new_raw, n
+
+
+# ───────────────────────── 跨 run 文本节点替换（保留原有格式）
+def replace_text_nodes(raw, old, new, count=0):
+    """在 <w:t> 文本节点层面替换字符串，支持跨节点命中（保留 run 与格式）。
+    count=0 表示全文替换。返回 (新 raw, 实际替换处数)。"""
+    out, last, done = [], 0, 0
+    for a, b in para_spans(raw):
+        seg = raw[a:b]
+        out.append(raw[last:a])
+        while True:
+            if count and done >= count:
+                break
+            hits = list(_T_RE.finditer(seg))
+            chars, owner, offs = [], [], []
+            for k, m in enumerate(hits):
+                txt = _html.unescape(m.group(2))
+                for j, ch in enumerate(txt):
+                    chars.append(ch); owner.append(k); offs.append(j)
+            text = ''.join(chars)
+            i = text.find(old)
+            if i < 0:
+                break
+            k0, k1 = owner[i], owner[i + len(old) - 1]
+            o0, o1 = offs[i], offs[i + len(old) - 1]
+            esc = lambda x: _html.escape(x, quote=False)
+            rebuild = {}
+            for k in range(k0, k1 + 1):
+                t = _html.unescape(hits[k].group(2))
+                if k0 == k1:
+                    rebuild[k] = esc(t[:o0] + new + t[o1 + 1:])
+                elif k == k0:
+                    rebuild[k] = esc(t[:o0] + new)
+                elif k == k1:
+                    rebuild[k] = esc(t[o1 + 1:])
+                else:
+                    rebuild[k] = ''
+            for k in range(k1, k0 - 1, -1):          # 倒序替换，保持偏移有效
+                m = hits[k]
+                seg = seg[:m.start(2)] + rebuild[k] + seg[m.end(2):]
+            done += 1
+        out.append(seg)
+        last = b
+    out.append(raw[last:])
+    return ''.join(out), done
