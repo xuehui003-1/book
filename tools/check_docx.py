@@ -138,8 +138,18 @@ def check(path):
             expect_open = not expect_open
     if misuse:
         add('必改', 'C7', f'引号开合次序异常 {misuse} 处，首例：{first_bad}')
-    if '"' in full:
-        add('必改', 'C8', f'正文残留英文直引号 {full.count(chr(34))} 处，应改为中文弯引号')
+    # C8 英文直引号：只在**正文**里算错；公式/代码里的 " 是语法必需，不得改成中文弯引号
+    CODE_RE = re.compile(r'(=\s*[A-Za-z][\w.]*\(|=\s*[A-Za-z]\w*\s*"|=\s*""|\bimport\s+\w|\bdef\s+\w|print\(|folder_path|\.py\b|pip install|-->|\[\s*"|\{\s*")')
+    prose_q = 0
+    for p in paras:
+        if p['in_table']:
+            continue
+        t = p['text']
+        if '"' not in t or CODE_RE.search(t):
+            continue
+        prose_q += t.count('"')
+    if prose_q:
+        add('必改', 'C8', f'正文残留英文直引号 {prose_q} 处，应改为中文弯引号（公式/代码内的引号不计）')
 
     # C10 残留批注
     if com:
