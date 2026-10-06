@@ -192,3 +192,50 @@ def prepend_paras(raw, anchor, paras_xml, exact=True, nth=0):
     """在 anchor 段落之前插入若干新段落；返回 (新 raw, 段索引)"""
     i, a, b = find_para(raw, anchor, exact=exact, nth=nth)
     return raw[:a] + ''.join(paras_xml) + raw[a:], i
+
+
+# ───────────────────────── 标点/间距规范化（第 10 轮新增）
+_T_RE = re.compile(r'(<w:t(?: [^>]*)?>)(.*?)(</w:t>)', re.S)
+_CJK = '\u4e00-\u9fff'
+
+
+def _fix_text(s):
+    s = s.replace('／', '/')          # 全角斜杠 → 半角
+    s = s.replace('**', '')           # 去掉 Markdown 粗体标记（Word 里会原样显示）
+    s = re.sub(r'(?<=[A-Za-z]) (?=[' + _CJK + r'])', '', s)   # 拉丁 + 空格 + 中文
+    s = re.sub(r'(?<=[' + _CJK + r']) (?=[A-Za-z])', '', s)   # 中文 + 空格 + 拉丁
+    return s
+
+
+def normalize_punct_docx(raw, verbose=False):
+    """在 <w:t> 文本节点内做标点/间距规范化，保留 run 与格式。
+    规则（依据全书 28 册语料统计：中文紧邻拉丁 5721 处 vs 空格 25 处；半角斜杠 651 vs 全角 31）：
+      1) 全角斜杠「／」→ 半角「/」
+      2) 删除 Markdown 标记「**」
+      3) 中英文之间不留空格（数字与中文之间的空格保留：多为表格步骤编号「1 新建…」）
+    返回 (新 raw, 改动处数)。
+    """
+    n = 0
+
+    def repl(m):
+        nonlocal n
+        old = m.group(2)
+        new = _fix_text(old)
+        if new != old:
+            n += 1
+        return m.group(1) + new + m.group(3)
+
+    out = []
+    for a, b in para_spans(raw):
+        out.append(raw[a:b])
+    # 逐段处理（避免误伤表格边框等非文本内容——只替换 <w:t> 内部）
+    res, last = [], 0
+    for a, b in para_spans(raw):
+        res.append(raw[last:a])
+        res.append(_T_RE.sub(repl, raw[a:b]))
+        last = b
+    res.append(raw[last:])
+    new_raw = ''.join(res)
+    if verbose:
+        print('  normalize_punct：改动 %d 个文本节点' % n)
+    return new_raw, n

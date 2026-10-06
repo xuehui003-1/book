@@ -25,7 +25,7 @@ import os, re, sys, shutil, zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from docx_utils import (para_spans, para_text, find_para, find_in_t, set_center,
-                        mk_para, prepend_paras, rewrite_para)
+                        mk_para, prepend_paras, rewrite_para, normalize_punct_docx)
 
 SRC = '项目4 财务数据的获取整理与整合.docx'
 WORK = '/tmp/p4v1'
@@ -464,6 +464,9 @@ def main():
     stage_A(); stage_B(); stage_C()
     log('【E】补栏目')
     stage_E()
+
+    W, _n = normalize_punct_docx(W, verbose=True)
+    log('【F】标点/间距规范化：全角斜杠→半角、去 Markdown 标记、中英文之间去空格（%d 个文本节点）' % _n)
 
     import html as _h
     full = _h.unescape(''.join(re.findall(r'<w:t(?: [^>]*)?>(.*?)</w:t>', W, re.S)))
