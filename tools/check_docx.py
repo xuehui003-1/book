@@ -39,13 +39,16 @@ def read_docx(path):
 
 def paragraphs(raw):
     out = []
+    # 表格区间：表格单元格里的段落不能被当作题注（如实践报告模板里的行标题「图2-7对我的启发」）
+    tbl = [(m.start(), m.end()) for m in re.finditer(r'<w:tbl>.*?</w:tbl>', raw, re.S)]
     for m in re.finditer(r'<w:p[ >].*?</w:p>', raw, re.S):
         seg = raw[m.start():m.end()]
         txt = unesc(''.join(NS_T.findall(seg)))
         jc = re.search(r'<w:jc w:val="([^"]+)"', seg)
         st = re.search(r'w:pStyle w:val="([^"]+)"', seg)
         out.append(dict(seg=seg, text=txt, jc=jc.group(1) if jc else None,
-                        style=st.group(1) if st else None))
+                        style=st.group(1) if st else None,
+                        in_table=any(a <= m.start() < b for a, b in tbl)))
     return out
 
 # ─────────────────────────────────────────────── 检查
@@ -61,6 +64,8 @@ def check(path):
     caps = []        # (类型, 项目号, 编号, 段号, 全文, para)
     BADPUNCT = '。？！，；：'
     for i, p in enumerate(paras):
+        if p['in_table']:      # 表格内的段落不是题注
+            continue
         t = p['text'].strip()
         if len(t) > 45:
             continue
@@ -116,22 +121,23 @@ def check(path):
     nl, nr = full.count('“'), full.count('”')
     if nl != nr:
         add('必改', 'C6', f'引号不配对：左引号“ {nl} 个、右引号” {nr} 个，相差 {abs(nl - nr)}')
+    # 全局流式交替检测：按出现顺序，第 1/3/5… 个应为 “，第 2/4/6… 个应为 ”。
+    # 段内「必须自配对」会把跨段引号（如多行提示词模板）误判，故改为全局判定。
     misuse = 0
-    bad_paras = []
+    first_bad = None
+    expect_open = True
     for p in paras:
-        t = p['text']; seq = ''.join(c for c in t if c in '“”')
-        if not seq: continue
-        if not re.match(r'^(“”)*$', seq):
-            misuse += 1; bad_paras.append(t.strip()[:34])
-    # 交替检测：正确应为 “ ” “ ” …；用启发式统计被当成左引号的”
-    heur = 0
-    for p in paras:
-        t = p['text']
-        for k, ch in enumerate(t):
-            if ch == '”' and k + 1 < len(t) and re.match(f'[{CJK}A-Za-z0-9]', t[k + 1]) is None:
-                pass
-    if bad_paras:
-        add('必改', 'C7', f'引号开合次序异常 {misuse} 处，首例：{bad_paras[0]}')
+        for ch in p['text']:
+            if ch not in '“”':
+                continue
+            want = '“' if expect_open else '”'
+            if ch != want:
+                misuse += 1
+                if first_bad is None:
+                    first_bad = p['text'].strip()[:34]
+            expect_open = not expect_open
+    if misuse:
+        add('必改', 'C7', f'引号开合次序异常 {misuse} 处，首例：{first_bad}')
     if '"' in full:
         add('必改', 'C8', f'正文残留英文直引号 {full.count(chr(34))} 处，应改为中文弯引号')
 
