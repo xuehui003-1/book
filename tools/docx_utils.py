@@ -135,3 +135,60 @@ def delete_paras(raw, idxs):
         a, b = spans[i]
         raw = raw[:a] + raw[b:]
     return raw
+
+
+# ───────────────────────────────── 段落重建（保留 pPr / paraId / 加粗）
+def _rpr_of(run):
+    m = re.search(r'<w:rPr>.*?</w:rPr>', run, re.S)
+    return m.group(0) if m else None
+
+
+def _make_bold(rpr):
+    if not rpr or '<w:b/>' in rpr:
+        return rpr
+    if '</w:rFonts>' in rpr:
+        return rpr.replace('</w:rFonts>', '</w:rFonts><w:b/><w:bCs/>', 1)
+    return rpr.replace('<w:rPr>', '<w:rPr><w:b/><w:bCs/>', 1)
+
+
+def _make_plain(rpr):
+    return re.sub(r'<w:b/>|<w:bCs/>', '', rpr) if rpr else rpr
+
+
+def build_para(seg, parts):
+    """按 [(文本, 是否加粗), ...] 重建整段，保留原 pPr / paraId / 字体属性"""
+    pid = re.search(r'w14:paraId="[^"]*"', seg)
+    pid = ' ' + pid.group(0) if pid else ''
+    ppr = re.search(r'<w:pPr>.*?</w:pPr>', seg, re.S)
+    ppr = ppr.group(0) if ppr else ''
+    b_rpr = p_rpr = None
+    for r in re.findall(r'<w:r>.*?</w:r>', seg, re.S):
+        rpr = _rpr_of(r)
+        if not rpr:
+            continue
+        if re.search(r'<w:b/>', rpr):
+            b_rpr = b_rpr or rpr
+        else:
+            p_rpr = p_rpr or rpr
+    if p_rpr is None:
+        p_rpr = _make_plain(b_rpr) if b_rpr else '<w:rPr>%s</w:rPr>' % DEFAULT_RPR
+    if b_rpr is None:
+        b_rpr = _make_bold(p_rpr)
+    out = ['<w:p%s>%s' % (pid, ppr)]
+    for text, bold in parts:
+        out.append('<w:r>%s<w:t xml:space="preserve">%s</w:t></w:r>'
+                   % (b_rpr if bold else p_rpr, html.escape(text, quote=False)))
+    out.append('</w:p>')
+    return ''.join(out)
+
+
+def rewrite_para(raw, needle, parts):
+    """按纯文本定位段落并整体重建；返回 (新 raw, 段索引)"""
+    i, a, b = find_para(raw, needle, exact=False)
+    return raw[:a] + build_para(raw[a:b], parts) + raw[b:], i
+
+
+def prepend_paras(raw, anchor, paras_xml, exact=True, nth=0):
+    """在 anchor 段落之前插入若干新段落；返回 (新 raw, 段索引)"""
+    i, a, b = find_para(raw, anchor, exact=exact, nth=nth)
+    return raw[:a] + ''.join(paras_xml) + raw[a:], i
