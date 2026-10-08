@@ -285,3 +285,76 @@ def replace_text_nodes(raw, old, new, count=0):
         last = b
     out.append(raw[last:])
     return ''.join(out), done
+
+# ───────────────────── 引号无关匹配 / 段内替换（第 12 轮新增）
+_QMAP = str.maketrans({'“': '"', '”': '"', '‘': "'", '’': "'"})
+
+
+def norm_quotes(s):
+    """把弯引号统一成直引号，只用于匹配（长度不变，便于按位置回填）"""
+    return s.translate(_QMAP)
+
+
+def find_para_loose(raw, needle, nth=0):
+    """按段落纯文本定位，**引号方向无关**；返回 (索引, 起, 止)"""
+    hit = 0
+    n = norm_quotes(needle)
+    for i, (a, b) in enumerate(para_spans(raw)):
+        if n in norm_quotes(para_text(raw, a, b).strip()):
+            if hit == nth:
+                return i, a, b
+            hit += 1
+    raise ValueError('未找到段落（引号无关）：' + needle[:60])
+
+
+def replace_in_span(raw, a, b, old, new):
+    """在 [a,b) 段内做跨 <w:t> 的替换，**保留 needle 之外的原文与 run 格式**。
+    needle 与段内文字按引号方向无关匹配。返回新 raw。"""
+    seg = raw[a:b]
+    hits = list(_T_RE.finditer(seg))
+    chars, owner, offs = [], [], []
+    for k, m in enumerate(hits):
+        txt = _html.unescape(m.group(2))
+        for j, ch in enumerate(txt):
+            chars.append(ch); owner.append(k); offs.append(j)
+    text = ''.join(chars)
+    i = norm_quotes(text).find(norm_quotes(old))
+    if i < 0:
+        raise ValueError('段内未找到：' + old[:50])
+    k0, k1 = owner[i], owner[i + len(old) - 1]
+    o0, o1 = offs[i], offs[i + len(old) - 1]
+    esc = lambda x: _html.escape(x, quote=False)
+    rebuild = {}
+    for k in range(k0, k1 + 1):
+        t = _html.unescape(hits[k].group(2))
+        if k0 == k1:
+            rebuild[k] = esc(t[:o0] + new + t[o1 + 1:])
+        elif k == k0:
+            rebuild[k] = esc(t[:o0] + new)
+        elif k == k1:
+            rebuild[k] = esc(t[o1 + 1:])
+        else:
+            rebuild[k] = ''
+    for k in range(k1, k0 - 1, -1):          # 倒序替换，保持偏移有效
+        m = hits[k]
+        seg = seg[:m.start(2)] + rebuild[k] + seg[m.end(2):]
+    return raw[:a] + seg + raw[b:]
+
+
+def patch_para(raw, needle, new):
+    """needle 恰好等于整段 → 整段重建；否则**段内替换**（保留其余原文字，不再吞段）。
+    返回 (新 raw, 模式)。这就是「needle 取段中短语吞掉段首段尾」的通用修法。"""
+    i, a, b = find_para_loose(raw, needle)
+    t = para_text(raw, a, b).strip()
+    if norm_quotes(t) == norm_quotes(needle):
+        return raw[:a] + build_para(raw[a:b], [(new, False)]) + raw[b:], '整段'
+    return replace_in_span(raw, a, b, needle, new), '段内'
+
+
+def require_full_para(raw, needle, note):
+    """guard：needle 必须等于整段，否则报错（防止整段重建时静默吞掉段首/段尾）"""
+    i, a, b = find_para_loose(raw, needle)
+    t = para_text(raw, a, b).strip()
+    if norm_quotes(t) != norm_quotes(needle):
+        raise ValueError('needle 不是整段（会吞掉段首/段尾）→ %s\n  段原文：%s' % (note, t[:80]))
+    return i, a, b
