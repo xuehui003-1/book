@@ -91,6 +91,13 @@ def check(path):
         add('必改', 'C2', f'题注缺空格 {len(bad_space)} 处：' + '；'.join(bad_space))
 
     # C3 / C4 / C5
+    doc_proj = caps[0][1] if caps else None
+    if doc_proj is None:
+        m_fn = re.search(r'项目(\d+)', path)
+        if m_fn:
+            doc_proj = int(m_fn.group(1))
+    proj_prefix = f'{doc_proj}-' if doc_proj is not None else '1-'
+
     have = {}
     for kind, proj, num, i, t, p in caps:
         have.setdefault(kind, set()).add(num)
@@ -98,23 +105,26 @@ def check(path):
     for i, p in enumerate(paras):
         t = p['text']
         is_cap = any(t.strip() == c[4] for c in caps) if t.strip() else False
-        for m in re.finditer(r'(图|表)\d+-(\d+)', t):
+        for m in re.finditer(r'(图|表)(\d+)-(\d+)', t):
             if is_cap and m.start() == 0: continue
-            refs.setdefault(m.group(1), {}).setdefault(int(m.group(2)), 0)
-            refs[m.group(1)][int(m.group(2))] += 1
+            ref_kind, ref_proj, ref_num = m.group(1), int(m.group(2)), int(m.group(3))
+            if doc_proj is not None and ref_proj != doc_proj:
+                continue  # 跨项目引用（如项目9引用项目6的表6-4），不计入本册题注核对
+            refs.setdefault(ref_kind, {}).setdefault(ref_num, 0)
+            refs[ref_kind][ref_num] += 1
     for kind in ('图', '表'):
         hs, rs = have.get(kind, set()), set(refs.get(kind, {}))
         missing = sorted(rs - hs)          # 引用了但无题注
         unused = sorted(hs - rs)           # 有题注但正文未引用
         if missing:
-            add('必改', 'C5', f'悬空交叉引用：{kind}1-' + f'、{kind}1-'.join(map(str, missing)) + ' 被正文引用但无对应题注')
+            add('必改', 'C5', f'悬空交叉引用：{kind}{proj_prefix}' + f'、{kind}{proj_prefix}'.join(map(str, missing)) + ' 被正文引用但无对应题注')
         if hs:
             mx = max(hs)
             gaps = [n for n in range(1, mx + 1) if n not in hs]
             if gaps:
-                add('必改', 'C4', f'{kind}编号不连续，缺 ' + '、'.join(f'{kind}1-{g}' for g in gaps))
+                add('必改', 'C4', f'{kind}编号不连续，缺 ' + '、'.join(f'{kind}{proj_prefix}{g}' for g in gaps))
         if unused:
-            add('提示', 'C3', f'{kind}题注存在但正文未引用：' + '、'.join(f'{kind}1-{u}' for u in sorted(unused)))
+            add('提示', 'C3', f'{kind}题注存在但正文未引用：' + '、'.join(f'{kind}{proj_prefix}{u}' for u in sorted(unused)))
 
     # C6 / C7 / C8
     full = ''.join(p['text'] for p in paras)
