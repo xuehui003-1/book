@@ -48,6 +48,8 @@ python3 tools/check_docx.py *.docx --md 自检报告.md
 | `docx_utils.py` | docx 段落级读写工具库（段落定位、整段重建、居中设置等） |
 | `revise_project1_v2.py` | 项目1 V2 修订脚本，可作为项目2～12 修订脚本的模板 |
 | `revise_project5_v1.py` | 项目5 V1 修订脚本（案例改 1—6 月 + 标题层级 + 引号 + 题注 + 补栏目），**含更完整的可复用套路** |
+| `revise_project6_v1.py` | 项目6 V1 修订脚本（案例并轨 + 数字互证 + 标题层级 + 引号 + 题注 + 补栏目 + 参考答案） |
+| `revise_project7_v1.py` | 项目7 V1 修订脚本（案例锚定 + 数字互证 + 标题层级 + 引号 + 题注 + 补栏目） |
 | `audit_a_class.py` | A 类批注（A1～A7）逐条审计，输出判定＋段落号＋原文 |
 | `fix_a_class.py` | 按审计结果修 A1/A2（可指定册与版本） |
 
