@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant S as 学生
+  participant A as AI工具
+  participant R as 原始来源
+  participant L as 核验记录表
+  S->>A: 提交含约束的提示词
+  A-->>S: 返回回答（含数字、出处、结论）
+  S->>R: 逐条查找依据
+  alt 找到依据
+    R-->>S: 核实结果：一致
+    S->>L: 记录来源与核实方法
+  else 找不到依据
+    R-->>S: 核实结果：未找到
+    S->>L: 删除或标注“待核实”
+  end
