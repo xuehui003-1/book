@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="830" height="480" viewBox="0 0 830 480" font-family="Microsoft YaHei, SimHei, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="830" height="480" viewBox="0 0 830 480" font-family="Noto Sans SC, Microsoft YaHei, SimHei, sans-serif">
 <rect width="830" height="480" fill="#FFFFFF"/>
 <text x="415.0" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#1A202C">图4-3 常见票据的审核维度矩阵（热力图）</text>
 <text x="415.0" y="64" text-anchor="middle" font-size="14" fill="#4A5568">绿色：满足；黄色：部分满足；红色：不满足。“直接报销”需以单位具体制度为准。</text>
