@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="830" height="480" viewBox="0 0 830 480" font-family="Noto Sans SC, Microsoft YaHei, SimHei, sans-serif">
+<rect width="830" height="480" fill="#FFFFFF"/>
+<text x="415.0" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#1A202C">图4-3 常见票据的审核维度矩阵（热力图）</text>
+<text x="415.0" y="64" text-anchor="middle" font-size="14" fill="#4A5568">绿色：满足；黄色：部分满足；红色：不满足。“直接报销”需以单位具体制度为准。</text>
+<text x="265.0" y="95" text-anchor="middle" font-size="16" fill="#1A202C">能证明业务</text>
+<text x="415.0" y="95" text-anchor="middle" font-size="16" fill="#1A202C">能证明单位</text>
+<text x="565.0" y="95" text-anchor="middle" font-size="16" fill="#1A202C">能证明金额</text>
+<text x="715.0" y="95" text-anchor="middle" font-size="16" fill="#1A202C">能否直接报销</text>
+<text x="175" y="151.0" text-anchor="end" font-size="16" fill="#1A202C">增值税发票</text>
+<rect x="190" y="110" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="263.0" y="149.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="340" y="110" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="413.0" y="149.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="490" y="110" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="563.0" y="149.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="640" y="110" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="713.0" y="149.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<text x="175" y="221.0" text-anchor="end" font-size="16" fill="#1A202C">超市、餐饮小票</text>
+<rect x="190" y="180" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="263.0" y="219.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<rect x="340" y="180" width="146" height="66" rx="6" fill="#FED7D7"/>
+<text x="413.0" y="219.0" text-anchor="middle" font-size="16" fill="#1A202C">否</text>
+<rect x="490" y="180" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="563.0" y="219.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<rect x="640" y="180" width="146" height="66" rx="6" fill="#FED7D7"/>
+<text x="713.0" y="219.0" text-anchor="middle" font-size="16" fill="#1A202C">否</text>
+<text x="175" y="291.0" text-anchor="end" font-size="16" fill="#1A202C">铁路电子客票</text>
+<rect x="190" y="250" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="263.0" y="289.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="340" y="250" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="413.0" y="289.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<rect x="490" y="250" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="563.0" y="289.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="640" y="250" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="713.0" y="289.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<text x="175" y="361.0" text-anchor="end" font-size="16" fill="#1A202C">网约车行程单</text>
+<rect x="190" y="320" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="263.0" y="359.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<rect x="340" y="320" width="146" height="66" rx="6" fill="#FED7D7"/>
+<text x="413.0" y="359.0" text-anchor="middle" font-size="16" fill="#1A202C">否</text>
+<rect x="490" y="320" width="146" height="66" rx="6" fill="#C6F6D5"/>
+<text x="563.0" y="359.0" text-anchor="middle" font-size="16" fill="#1A202C">是</text>
+<rect x="640" y="320" width="146" height="66" rx="6" fill="#FEFCBF"/>
+<text x="713.0" y="359.0" text-anchor="middle" font-size="16" fill="#1A202C">部分</text>
+<text x="190" y="455" font-size="13" fill="#4A5568">数据为示意性归纳，用于教学说明，不代表任何具体单位的审核结论。</text>
+</svg>

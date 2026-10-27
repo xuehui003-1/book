@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="800" viewBox="0 0 760 800" font-family="Noto Sans SC, Microsoft YaHei, SimHei, sans-serif">
+<defs><marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4A5568"/></marker></defs>
+<rect width="760" height="800" fill="#FFFFFF"/>
+<text x="300" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1A202C">图4-4 大模型识别票据信息的核对流程</text>
+<rect x="150" y="35" width="300" height="50" rx="10" fill="#E8F1FB" stroke="#2B6CB0" stroke-width="2"/>
+<text x="300" y="66" text-anchor="middle" font-size="16" fill="#1A202C">拍照或导出票据文件</text>
+<path d="M300,85 V115" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="150" y="120" width="300" height="50" rx="10" fill="#E8F1FB" stroke="#2B6CB0" stroke-width="2"/>
+<text x="300" y="151" text-anchor="middle" font-size="16" fill="#1A202C">用改进版提示词让AI识别</text>
+<path d="M300,170 V208" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<polygon points="300,210 430,260 300,310 170,260" fill="#FFF7E6" stroke="#B7791F" stroke-width="2"/>
+<text x="300" y="266" text-anchor="middle" font-size="15" fill="#1A202C">与原票逐项比对</text>
+<path d="M430,260 H498" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="440" y="250" font-size="14" fill="#2D3748">不一致</text>
+<rect x="500" y="232" width="220" height="56" rx="10" fill="#FDECEC" stroke="#C53030" stroke-width="2"/>
+<text x="610" y="266" text-anchor="middle" font-size="16" fill="#1A202C">修正字段，必要时重新识别</text>
+<path d="M610,288 V320 H375 V283" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<path d="M300,310 V345" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="308" y="333" font-size="14" fill="#2D3748">一致</text>
+<polygon points="300,345 450,400 300,455 150,400" fill="#FFF7E6" stroke="#B7791F" stroke-width="2"/>
+<text x="300" y="406" text-anchor="middle" font-size="15" fill="#1A202C">金额+税额=价税合计?</text>
+<path d="M450,400 H498" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="458" y="392" font-size="14" fill="#2D3748">否</text>
+<rect x="500" y="372" width="220" height="56" rx="10" fill="#FDECEC" stroke="#C53030" stroke-width="2"/>
+<text x="610" y="406" text-anchor="middle" font-size="16" fill="#1A202C">查原票，找出错误字段</text>
+<path d="M610,428 V470 H400 V420" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<path d="M300,455 V490" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="308" y="478" font-size="14" fill="#2D3748">是</text>
+<rect x="150" y="490" width="300" height="50" rx="10" fill="#E8F1FB" stroke="#2B6CB0" stroke-width="2"/>
+<text x="300" y="521" text-anchor="middle" font-size="16" fill="#1A202C">通过税务渠道查验</text>
+<path d="M300,540 V570" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<polygon points="300,575 450,630 300,685 150,630" fill="#FFF7E6" stroke="#B7791F" stroke-width="2"/>
+<text x="300" y="636" text-anchor="middle" font-size="15" fill="#1A202C">查验结果有效?</text>
+<path d="M450,630 H498" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="458" y="622" font-size="14" fill="#2D3748">否</text>
+<rect x="500" y="602" width="220" height="56" rx="10" fill="#FDECEC" stroke="#C53030" stroke-width="2"/>
+<text x="610" y="636" text-anchor="middle" font-size="16" fill="#1A202C">标记为存疑，不予报销</text>
+<path d="M300,685 V712" fill="none" stroke="#4A5568" stroke-width="2" marker-end="url(#ar)"/>
+<text x="308" y="702" font-size="14" fill="#2D3748">是</text>
+<rect x="150" y="715" width="300" height="50" rx="10" fill="#E6FFFA" stroke="#2C7A7B" stroke-width="2"/>
+<text x="300" y="746" text-anchor="middle" font-size="16" fill="#1A202C">记录核对结果，进入报销流程</text>
+</svg>
